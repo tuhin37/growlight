@@ -2,6 +2,8 @@
 #include "config.h"
 #include "globals.h"
 #include "functions.h"
+#include "serial.h"
+
 
 
 
@@ -18,8 +20,8 @@ void setup() {
 }
 
 void loop() {
-    analogWrite(RED, 200);
-    analogWrite(BLUE, 100);
+    //analogWrite(RED, 200);
+    //analogWrite(BLUE, 100);
 }
 
 
@@ -31,11 +33,35 @@ void oneSecCallback() {
     if(s==60) {
         s=0;
         m++;
+
+        //rising light lightCurve
+        if(lightCurve==RISE) {
+            risingLight();           
+        }
+        else if(lightCurve==FALL) {
+            fallingLight();
+        }
+        else if(lightCurve==MAX) {
+            analogWrite(RED, maxRed);
+            analogWrite(BLUE, maxBlue);
+            currentRed = maxRed;
+            currentBlue = maxBlue;
+        }
+        else if(lightCurve==OFF) {
+            analogWrite(RED, 0);
+            analogWrite(RED, 0);
+            currentRed = 0;
+            currentBlue = 0;
+        }
+
     }
 
     if(m==60) {
         m=0;
         h++;
+        
+        
+
     }
 
     if(h==24) {
@@ -45,12 +71,60 @@ void oneSecCallback() {
     }
 
     // display time`
-    // Serial.print(h);
-    // Serial.print(":");
-    // Serial.print(m);
-    // Serial.print(":");
-    // Serial.println(s);
+    if(flagClock) {
+        Serial.print(h);
+        Serial.print(":");
+        Serial.print(m);
+        Serial.print(":");
+        Serial.print(s);
+        Serial.print("  ");
+        
+        Serial.print("Red:(");
+        Serial.print(currentRed);
+        Serial.print("/");
+        Serial.print(maxRed);
+        Serial.print(")  ");
 
-    Serial.println(getMoisture());
+        Serial.print("Blue:(");
+        Serial.print(currentBlue);
+        Serial.print("/");
+        Serial.print(maxBlue);
+        Serial.print(")  ");
+
+        if(lightCurve==RISE) {
+            Serial.println("RISING");
+        }
+        else if(lightCurve==FALL) {
+            Serial.println("FALLING");
+        }
+        else if(lightCurve==MAX){
+            Serial.println("MAX");
+        }
+        else if(lightCurve==OFF){
+            Serial.println("OFF");
+        } 
+    }
+
+    // set the leds in rising mode 
+    if(h>=5 && h<8) {
+        lightCurve = RISE;
+    }
+    // set the leds in MAX mode
+    else if(h>=8 && h<18) {
+        lightCurve = MAX;
+    }
+    // set the leds in falling mode
+    else if(h>=18 && h<21) {
+        lightCurve = FALL;
+    }
+    // set the leds in OFF mode
+    else if(h>=21 || h<5) {
+        lightCurve = OFF;
+    }
+
+
 }
+
+
+
         
