@@ -49,7 +49,7 @@ void oneSecCallback() {
         }
         else if(lightCurve==OFF) {
             analogWrite(RED, 0);
-            analogWrite(RED, 0);
+            analogWrite(BLUE, 0);
             currentRed = 0;
             currentBlue = 0;
         }
